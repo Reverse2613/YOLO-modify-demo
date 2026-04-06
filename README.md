@@ -14,6 +14,8 @@
 数据集VisDrone
 
 文件结构:
+
+```
 tracking/
 │
 ├── core/                   # 核心训练与推理控制
@@ -43,6 +45,7 @@ tracking/
 │    |——visdrone.yaml           #数据集配置文件
 |    
 └── main.py                 # 项目入口点
+```
 
 
 
