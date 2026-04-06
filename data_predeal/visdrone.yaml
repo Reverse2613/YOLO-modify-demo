@@ -1,0 +1,18 @@
+# VisDrone 数据集路径配置
+# 这里的路径是相对于你运行代码的当前目录
+path: /root/private_data/tracking/data_predeal/yolo_dataset
+train: train/images  # 训练集图片的存放位置
+val: val/images      # 验证集图片的存放位置
+
+# 类别字典 与data_convert.py中的类别对应
+names:
+  0: pedestrian      # 行人
+  1: people          # 人群
+  2: bicycle         # 自行车
+  3: car             # 小汽车
+  4: van             # 面包车
+  5: truck           # 卡车
+  6: tricycle        # 三轮车
+  7: awning-tricycle # 带篷三轮车
+  8: bus             # 公交车
+  9: motor           # 摩托车
