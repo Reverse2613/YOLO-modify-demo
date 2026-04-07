@@ -50,6 +50,8 @@ tracking/
 
 
 对了，训练完成后会得到一个runs文件夹，里面就有结果文件。在..\runs\detect\UAV_Research\yolov11_p2_gca_nwd下。
+yolov11_p2_gca_nwd文件夹下放的未使用预训练权重，直接随机初始化权重开始训练得到的模型结果。
+yolov11_p2_gca_nwd7-Prior文件夹下放的使用了预训练权重，训练后得到的模型结果。
 
 ## 原理
 
