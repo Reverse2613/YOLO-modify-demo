@@ -45,7 +45,9 @@ tracking/
 |    |——data_convert.py         #把VisDrone官方格式转为YOLO格式，数据处理
 |    |
 │    |——visdrone.yaml           #数据集配置文件
-|    
+|
+|__ Metrics.md 					#结果分析指导文件（可以照着该文件对结果分析）
+|
 └── main.py                 # 项目入口点
 ```
 
@@ -82,6 +84,53 @@ python data_convert.py
 cd ..
 #直接开始训练
 python main.py
+```
+
+
+
+## 代码执行流程图
+
+```
+用户运行: python main.py
+    ↓
+[1] inject_custom_modules()
+    ├─ 注册 GlobalContextAttention 到 tasks 命名空间
+    └─ 注册到 modules 命名空间
+    ↓
+[2] inject_nwd_loss()
+    └─ 替换 loss_module.bbox_iou 为自定义版本
+    ↓
+[3] model = YOLO("yolov11-p2-gca.yaml")
+    ├─ 读取 YAML 文件
+    ├─ 解析 backbone 结构（30层）
+    ├─ 解析 head 结构
+    ├─ 通过 globals() 查找每个模块类
+    │   └─ 找到 GlobalContextAttention 
+    ├─ 构建 PyTorch Sequential 模型
+    └─ 使用 Kaiming 初始化所有权重
+    ↓
+[4] model.info()
+    └─ 打印每层的参数量、输出形状
+    ↓
+[5] trainer = UAVTrainer(...)
+    └─ 保存模型实例和数据集路径
+    ↓
+[6] trainer.start_training()    #关于训练的参数设置可以自己尝试，不一定和我设置的一样
+    ├─ 调用 model.train()
+    │   ├─ 构建 DataLoader
+    │   ├─ 构建 AdamW 优化器
+    │   ├─ 构建损失函数（使用 NWD Loss）
+    │   └─ 进入 200 轮训练循环
+    │       ├─ 每轮遍历所有 batch
+    │       │   ├─ 前向传播
+    │       │   ├─ 计算损失
+    │       │   ├─ 反向传播
+    │       │   └─ 更新权重
+    │       └─ 每轮结束后验证
+    │           ├─ 计算 mAP
+    │           ├─ 保存最佳权重
+    │           └─ 检查早停条件
+    └─ 返回训练结果
 ```
 
 
@@ -139,5 +188,5 @@ python main.py
 
 Q1.为什么会改进了（改超参数、引入预训练权重），指标检测性能也很差呀？
 
-A1.可能是我们给网络模型训练的分辨率太低了（我们之前一直给的640*640），所以下一步可以继续更改图像分辨率为1280或者1536。以及数据集的质量太差了，本次使用的VisDrone2019-MOT数据集分布不均，且大多是小目标，类别分布不均匀，添加类别权重平衡，而且还需要改损失函数部分。
+A1.可能是我们给网络模型训练的分辨率太低了（我们之前一直给的640*640），所以下一步可以继续更改图像分辨率为1280或者1536。以及数据集的质量太差了，本次使用的VisDrone2019-MOT数据集分布不均，且大多是小目标，类别分布不均匀，添加类别权重平衡，而且还需要改损失函数部分。增大分辨率以及图像增强后结果上升了7个百分点左右。
 
